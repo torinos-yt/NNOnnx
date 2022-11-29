@@ -39,18 +39,7 @@ namespace NNOnnx
             cudaOptions.gpu_mem_limit = 2 * 1024 * 1024 * 1024;
             cudaOptions.cudnn_conv_algo_search = OrtCudnnConvAlgoSearchExhaustive;
             cudaOptions.do_copy_in_default_stream = 1;
-            //api.CreateCUDAProviderOptions(&cudaOptions);
 
-            //_cudaOptions = std::make_unique<OrtCUDAProviderOptions*>(cudaOptions);
-
-            //std::vector<const char*> keys
-            //{
-            //    "device_id", "gpu_mem_limit", "arena_extend_strategy", "cudnn_conv_algo_search",
-            //    "do_copy_in_default_stream", "cudnn_conv_use_max_workspace", "cudnn_conv1d_pad_to_nc1d"
-            //};
-            //std::vector<const char*> values{ "0", "2147483648", "kSameAsRequested", "DEFAULT", "1", "1", "1" };
-
-            //api.UpdateCUDAProviderOptions(*_cudaOptions, keys.data(), values.data(), keys.size());
             api.SessionOptionsAppendExecutionProvider_CUDA(static_cast<OrtSessionOptions*>(*_sessionOptions), &cudaOptions);
         }
 
@@ -109,7 +98,6 @@ namespace NNOnnx
         const OrtApi& api = Ort::GetApi();
 
         if(_rtOptions) api.ReleaseTensorRTProviderOptions(*_rtOptions.release());
-        //if(_cudaOptions) api.ReleaseCUDAProviderOptions(*_cudaOptions.release());
 
         if(_inputResourceMap.size() > 0)
             for(auto pair : _inputResourceMap) delete std::get<1>(pair.second);
@@ -154,39 +142,6 @@ namespace NNOnnx
 
     bool NNSession::Inference()
     {
-        //for(auto& pair : _inputResourceMap)
-        //{
-        //    CUDA_CHECK(cudaGraphicsMapResources(1, std::get<1>(pair.second)));
-
-        //    size_t size;
-        //    void* outputPtr;
-        //    CUDA_CHECK(cudaGraphicsResourceGetMappedPointer(&outputPtr, &size, *std::get<1>(pair.second)));
-
-        //    const auto& node = std::get<0>(pair.second);
-
-        //    auto tensor = Ort::Value::CreateTensor(*_memoryInfo, reinterpret_cast<float*>(outputPtr),
-        //        node->GetElementCount(), node->GetShape().data(), node->GetShape().size());
-
-        //    _binding->BindInput(node->GetName().data(), tensor);
-        //}
-
-        //for(auto& pair : _outputResourceMap)
-        //{
-        //    CUDA_CHECK(cudaGraphicsMapResources(1, std::get<1>(pair.second)));
-
-        //    size_t size;
-        //    void* outputPtr;
-
-        //    CUDA_CHECK(cudaGraphicsResourceGetMappedPointer(&outputPtr, &size, *std::get<1>(pair.second)));
-
-        //    const auto& node = std::get<0>(pair.second);
-
-        //    auto tensor = Ort::Value::CreateTensor(*_memoryInfo, reinterpret_cast<float*>(outputPtr),
-        //        node->GetElementCount(), node->GetShape().data(), node->GetShape().size());
-
-        //    _binding->BindOutput(node->GetName().data(), tensor);
-        //}
-
         _binding->SynchronizeInputs();
 
         try
@@ -199,12 +154,6 @@ namespace NNOnnx
         }
 
         _binding->SynchronizeOutputs();
-        
-        //for(auto& pair : _inputResourceMap)
-        //    CUDA_CHECK(cudaGraphicsUnmapResources(1, std::get<1>(pair.second)));
-
-        //for(auto& pair : _outputResourceMap)
-        //    CUDA_CHECK(cudaGraphicsUnmapResources(1, std::get<1>(pair.second)));
 
         return true;
     }
