@@ -1,0 +1,57 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel PreprocessNCHW
+#pragma kernel PreprocessNHWC
+
+// Input
+sampler2D _InputTexture;
+float2 _ImageSize;
+
+// Output
+RWBuffer<float> _Tensor;
+
+int _NormType;
+
+float3 SampleTexture(uint2 id)
+{
+    // UV (vertically flipped)
+    float2 uv = float2(0.5 + id.x, _ImageSize.y - 0.5 - id.y) / _ImageSize;
+
+    // UV gradients
+    float2 duv_dx = float2(1.0 / _ImageSize.x, 0);
+    float2 duv_dy = float2(0, -1.0 / _ImageSize.y);
+
+    // Texture sample
+    float3 rgb = tex2Dgrad(_InputTexture, uv, duv_dx, duv_dy).rgb;
+
+    if(_NormType == 1)
+        rgb = rgb * 2 - 1;
+    else if(_NormType == 2)
+        rgb *= 255;
+
+    return rgb;
+}
+
+[numthreads(8,8,1)]
+void PreprocessNCHW (uint3 id : SV_DispatchThreadID)
+{
+    float3 rgb = SampleTexture(id.xy);
+
+    // Tensor element output
+    uint offs = (id.y * _ImageSize.x + id.x);
+    uint plane = _ImageSize.x * _ImageSize.y;
+    _Tensor[plane * 0 + offs] = rgb.r;
+    _Tensor[plane * 1 + offs] = rgb.g;
+    _Tensor[plane * 2 + offs] = rgb.b;
+}
+
+[numthreads(8,8,1)]
+void PreprocessNHWC (uint3 id : SV_DispatchThreadID)
+{
+    float3 rgb = SampleTexture(id.xy);
+
+    // Tensor element output
+    uint offs = (id.y * _ImageSize.x + id.x);
+    _Tensor[offs * 3 + 0] = rgb.r;
+    _Tensor[offs * 3 + 1] = rgb.g;
+    _Tensor[offs * 3 + 2] = rgb.b;
+}

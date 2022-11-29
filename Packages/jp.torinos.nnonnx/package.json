@@ -1,0 +1,12 @@
+{
+  "description": "fast GPU inference with onnxruntime using cuda_interop on Unity",
+  "displayName": "NNOnnx",
+  "keywords": [
+    "unity"
+  ],
+  "name": "jp.torinos.nnonnx",
+  "license": "MIT",
+  "unity": "2020.1",
+  "unityRelease": "0f1",
+  "version": "0.1.0"
+}

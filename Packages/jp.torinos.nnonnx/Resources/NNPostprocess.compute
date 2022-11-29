@@ -1,0 +1,68 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Postprocess
+#pragma kernel PostprocessNCHW
+#pragma kernel PostprocessNHWC
+
+// Input
+Buffer<float> _Tensor;
+
+// Output
+float2 _ImageSize;
+RWTexture2D<float> _OutputTexture;
+RWTexture2D<float4> _OutputTextureRGB;
+
+int _NormType;
+
+[numthreads(8,8,1)]
+void Postprocess (uint3 id : SV_DispatchThreadID)
+{
+    // Texture element output
+    uint offs = ((_ImageSize.y - id.y - 1) * _ImageSize.x + id.x);
+    float r = _Tensor[offs];
+
+    if(_NormType == 1)
+        r = r * .5 + .5;
+    else if(_NormType == 2)
+        r /= 255;
+
+    _OutputTexture[id.xy] = r;
+}
+
+[numthreads(8,8,1)]
+void PostprocessNCHW (uint3 id : SV_DispatchThreadID)
+{
+    // Texture element output
+    uint offs = ((_ImageSize.y - id.y - 1) * _ImageSize.x + id.x);
+    uint plane = _ImageSize.x * _ImageSize.y;
+
+    float3 rgb;
+    rgb.r = _Tensor[plane * 0 + offs];
+    rgb.g = _Tensor[plane * 1 + offs];
+    rgb.b = _Tensor[plane * 2 + offs];
+
+    if(_NormType == 1)
+        rgb = rgb * .5 + .5;
+    else if(_NormType == 2)
+        rgb /= 255;
+
+    _OutputTextureRGB[id.xy] = float4(rgb, 1);
+}
+
+[numthreads(8,8,1)]
+void PostprocessNHWC (uint3 id : SV_DispatchThreadID)
+{
+    // Texture element output
+    uint offs = ((_ImageSize.y - id.y - 1) * _ImageSize.x + id.x);
+
+    float3 rgb;
+    rgb.r = _Tensor[offs * 3 + 0];
+    rgb.g = _Tensor[offs * 3 + 1];
+    rgb.b = _Tensor[offs * 3 + 2];
+
+    if(_NormType == 1)
+        rgb = rgb * .5 + .5;
+    else if(_NormType == 2)
+        rgb /= 255;
+
+    _OutputTextureRGB[id.xy] = float4(rgb, 1);
+}
