@@ -83,7 +83,6 @@ namespace NNOnnx
     private:
 
         std::unique_ptr<OrtTensorRTProviderOptionsV2*> _rtOptions;
-        //std::unique_ptr<OrtCUDAProviderOptions*> _cudaOptions;
 
         std::unique_ptr<Ort::SessionOptions> _sessionOptions;
 
@@ -95,9 +94,6 @@ namespace NNOnnx
 
         std::unordered_map<std::string, std::tuple<NodeData*, cudaGraphicsResource_t*>> _inputResourceMap;
         std::unordered_map<std::string, std::tuple<NodeData*, cudaGraphicsResource_t*>> _outputResourceMap;
-
-        std::unordered_map<std::string, Ort::Value*> _recurrentTensorMap;
-        std::unordered_map<std::string, Ort::MemoryAllocation*> _recurrentDataMap;
 
         std::unique_ptr<Ort::IoBinding> _binding;
 
