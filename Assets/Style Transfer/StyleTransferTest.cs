@@ -20,7 +20,6 @@ public class StyleTransferTest : MonoBehaviour
     void Start()
     {
         string modelPath = Application.streamingAssetsPath + "/mosaic-8.onnx";
-        string cachePath = Application.streamingAssetsPath + "/EngineCache";
 
         _session = NNSession.CreateSessionWithCuda(modelPath);
 
