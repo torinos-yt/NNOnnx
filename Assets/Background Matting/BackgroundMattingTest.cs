@@ -69,7 +69,6 @@ public class BackgroundMattingTest : MonoBehaviour
         }
 
         _image.texture = _outputRT;
-        _srcimage.texture = _source.SourceTexture;
     }
 
     void Update()
@@ -79,6 +78,7 @@ public class BackgroundMattingTest : MonoBehaviour
         _session.Inference();
 
         TensorUtil.TensorBufferToTexture(_outputNode, _outputBuffer, _outputRT);
+        _srcimage.texture = _source.SourceTexture;
     }
 
     void OnDestroy()
