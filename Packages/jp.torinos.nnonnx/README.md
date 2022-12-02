@@ -2,7 +2,7 @@
 
 This is an alternative to [Barracuda](https://docs.unity3d.com/Packages/com.unity.barracuda@1.0/manual/index.html) for even faster machine learning inference on Unity in limited situations using the [onnxruntime](https://onnxruntime.ai/) and CUDA api.
 
-By using [CUDA's Graphics Interoperability](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__INTEROP.html) feature, NNOnnx uses resources on the GPU such as GraphicsBuffer and Texture directly as CUDA resources.
+By using [CUDA's Graphics Interoperability](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__INTEROP.html) feature, NNOnnx uses resources on the GPU such as GraphicsBuffer and Texture directly as CUDA resources without copying them to the CPU. This is more useful for models that require higher resolution image input.
 
 This provides the inference on more diversified onnx models and faster runtime speeds on PC platforms where CUDA available compared to the Unity Barracuda.
 
@@ -31,3 +31,8 @@ add the following entry to the Scoped Registries list:
 
 Now you can install the package from `My Registries` page in the Package Manager
 window.
+
+Related Project
+================
+- [Unity-TensorRT](https://github.com/aman-tiwari/Unity-TensorRT)
+- [TensorFlow Lite for Unity Samples](https://github.com/asus4/tf-lite-unity-sample)
